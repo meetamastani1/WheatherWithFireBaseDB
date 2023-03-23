@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "808697990837",
+    "firebase_url": "https://wheatherwithfirebaseauth-default-rtdb.firebaseio.com",
+    "project_id": "wheatherwithfirebaseauth",
+    "storage_bucket": "wheatherwithfirebaseauth.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:808697990837:android:5ba8ea56468fcce480f8fc",
+        "android_client_info": {
+          "package_name": "com.weather.firebaseauth"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "808697990837-ro8agcu3232tmq57airvn180g73sg1o1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBbjP9fxhtJC7CuK9pCT12fpr-94HBrTNQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "808697990837-ro8agcu3232tmq57airvn180g73sg1o1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
