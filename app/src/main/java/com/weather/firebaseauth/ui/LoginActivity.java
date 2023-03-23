@@ -87,10 +87,10 @@ public class LoginActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
         //if user already login
-        if (mAuth.getCurrentUser()!=null){
-            Intent intent = new Intent(LoginActivity.this, ProfilePageActivity.class);
-            startActivity(intent);
-        }
+//        if (mAuth.getCurrentUser()!=null){
+//            Intent intent = new Intent(LoginActivity.this, ProfilePageActivity.class);
+//            startActivity(intent);
+//        }
     }
 
     private boolean validateEmail() {

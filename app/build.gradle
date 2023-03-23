@@ -3,6 +3,20 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        debug {
+            storeFile file('/home/vaibhav/Desktop/AndroidProject/WheatherWithFireBaseAuth/Keystore/com.weather.firebaseauth.jks')
+            storePassword 'com.weather.firebaseauth'
+            keyAlias 'com.weather.firebaseauth'
+            keyPassword 'com.weather.firebaseauth'
+        }
+        Release {
+            storeFile file('/home/vaibhav/Desktop/AndroidProject/WheatherWithFireBaseAuth/Keystore/com.weather.firebaseauth.jks')
+            storePassword 'com.weather.firebaseauth'
+            keyAlias 'com.weather.firebaseauth'
+            keyPassword 'com.weather.firebaseauth'
+        }
+    }
     namespace 'com.weather.firebaseauth'
     compileSdk 33
 
@@ -14,6 +28,7 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        signingConfig signingConfigs.Release
     }
 
     buildTypes {

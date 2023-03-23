@@ -208,31 +208,10 @@ public class ProfilePageActivity extends AppCompatActivity {
                             } else {
                                 String pattern = "dd-MM-yyyy HH:mm:ss";
                                 SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
-                                try {
-                                    Date one = dateFormat.parse(lastDate);
-                                    Date two = dateFormat.parse(dayString);
-                                    SimpleDateFormat outFormat = new SimpleDateFormat("EEEE", Locale.ENGLISH);
-//                                    outFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-                                    outFormat.setTimeZone(TimeZone.getDefault());
-                                    String goal = outFormat.format(two);
-                                    Log.d("TAG", "daysname: " + goal + "  " + dayString);
-                                    if (one.before(two)) {
-                                        Log.d("TAG", "onChanged:before ");
-                                        // If start date is before end date.
-                                    } else if (one.equals(two)) {
-                                        Log.d("TAG", "onChanged:equal ");
-                                        // If two dates are equal.
-                                    } else {
-                                        Log.d("TAG", "onChanged:after ");
-                                        // If start date is after the end date.
-                                    }
-                                    lastDate = dayString;
+                                    lastDate = dayString.split("\\s+")[0];
                                     if (!lastDate.equalsIgnoreCase(dayString)) {
                                         weatherListData.add(listData);
                                     }
-                                } catch (ParseException e) {
-                                    e.printStackTrace();
-                                }
 
 
                             }

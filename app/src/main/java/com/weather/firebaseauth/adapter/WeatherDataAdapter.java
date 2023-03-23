@@ -49,10 +49,7 @@ public class WeatherDataAdapter extends RecyclerView.Adapter<WeatherDataAdapter.
             }
         });
 
-        SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
-        String dayString = sdf.format(new Date(weatherListData.get(position).dt));
-        Log.d("TAG", "onBindViewHolder: "+dayString);
-        holder.itemDailyWeatherBinding.txtDay.setText(dayString);
+        holder.itemDailyWeatherBinding.txtDay.setText(weatherListData.get(position).dt_txt);
         holder.itemDailyWeatherBinding.txtTemp.setText("Temprature: " + String.valueOf(weatherListData.get(position).main.temp));
         holder.itemDailyWeatherBinding.txtHumidity.setText("Humidity: " + String.valueOf(weatherListData.get(position).main.humidity));
         holder.itemDailyWeatherBinding.txtWeather.setText("Weather: " + weatherListData.get(position).weather.get(0).main);

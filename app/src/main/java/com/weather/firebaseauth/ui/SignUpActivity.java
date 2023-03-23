@@ -1,6 +1,7 @@
 package com.weather.firebaseauth.ui;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -18,6 +19,10 @@ import android.util.Patterns;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -93,12 +98,12 @@ public class SignUpActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 PermissionX.init(SignUpActivity.this)
-                        .permissions(Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.CAMERA)
+                        .permissions(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA)
                         .request((allGranted, grantedList, deniedList) -> {
                             if (allGranted) {
                                 openDialogForImagePick();
                             } else {
-                                Toast.makeText(getApplicationContext(),"Permission denied",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), "Permission denied", Toast.LENGTH_SHORT).show();
                             }
                         });
 
@@ -142,6 +147,9 @@ public class SignUpActivity extends AppCompatActivity {
 //                                                    Intent intent = new Intent(SignUpActivity.this, MainActivity.class);
 //                                                    startActivity(intent);
 //                                                    finish();
+                                                                            Intent intent = new Intent(SignUpActivity.this, ProfilePageActivity.class);
+                                                                            startActivity(intent);
+                                                                            finish();
                                                                         }
                                                                     });
                                                         }
@@ -174,35 +182,99 @@ public class SignUpActivity extends AppCompatActivity {
         });
     }
 
-    private void openDialogForImagePick(){
-        final CharSequence[] options = { "Take Photo", "Choose from Gallery","Cancel" };
+    // You can do the assignment inside onAttach or onCreate, i.e, before the activity is displayed
+    ActivityResultLauncher<Intent> someActivityResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        // There are no request codes
+                        Intent data = result.getData();
+                        File f = new File(Environment.getExternalStorageDirectory().toString());
+                        Log.d("TAG", "onActivityResult: " + f.getAbsolutePath());
+                        for (File temp : f.listFiles()) {
+                            if (temp.getName().equals("temp.jpg")) {
+                                f = temp;
+                                break;
+                            }
+                        }
+
+                        try {
+                            Log.d("TAG", "onActivityResult: vawje");
+                            Bitmap bitmap;
+                            BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
+                            bitmap = BitmapFactory.decodeFile(f.getAbsolutePath(),
+                                    bitmapOptions);
+                            activitySignupBinding.profileImage.setImageBitmap(bitmap);
+                            String path = android.os.Environment
+                                    .getExternalStorageDirectory()
+                                    + File.separator
+                                    + "Phoenix" + File.separator + "default";
+                            f.delete();
+                            OutputStream outFile = null;
+                            File file = new File(path, String.valueOf(System.currentTimeMillis()) + ".jpg");
+                            try {
+                                outFile = new FileOutputStream(file);
+                                bitmap.compress(Bitmap.CompressFormat.JPEG, 85, outFile);
+                                outFile.flush();
+                                outFile.close();
+                            } catch (FileNotFoundException e) {
+                                e.printStackTrace();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            });
+    ActivityResultLauncher<Intent> galleryIntent = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        // There are no request codes
+                        Intent data = result.getData();
+                        filePath = data.getData();
+                        try {
+                            InputStream inputStream = getContentResolver().openInputStream(filePath);
+                            bitmap = BitmapFactory.decodeStream(inputStream);
+                            activitySignupBinding.profileImage.setImageBitmap(bitmap);
+                        } catch (Exception e) {
+
+                        }
+                    }
+                }
+            });
+    private void openDialogForImagePick() {
+        final CharSequence[] options = {"Take Photo", "Choose from Gallery", "Cancel"};
         AlertDialog.Builder builder = new AlertDialog.Builder(SignUpActivity.this);
         builder.setTitle("Select Photo!");
         builder.setItems(options, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int item) {
-                if (options[item].equals("Take Photo"))
-                {
+                if (options[item].equals("Take Photo")) {
                     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-//                        File file = new File(android.os.Environment.getExternalStorageDirectory(), "temp.jpg");
-//                        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
-//                    } else {
-//                        File file = new File(getPhotoFileUri().getPath());
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+                        File file = new File(android.os.Environment.getExternalStorageDirectory(), "temp.jpg");
+                        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
+                    } else {
                         File file = new File(android.os.Environment.getExternalStorageDirectory(), "temp.jpg");
                         Uri photoUri = FileProvider.getUriForFile(getApplicationContext(), getApplicationContext().getPackageName() + ".provider", file);
                         intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
-//                    }
+                    }
 
 //                    intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
-                    startActivityForResult(intent, 1);
-                }
-                else if (options[item].equals("Choose from Gallery"))
-                {
-                    Intent intent = new   Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    startActivityForResult(intent, 2);
-                }
-                else if (options[item].equals("Cancel")) {
+                    someActivityResultLauncher.launch(intent);
+                } else if (options[item].equals("Choose from Gallery")) {
+                    Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    galleryIntent.launch(intent);
+                } else if (options[item].equals("Cancel")) {
                     dialog.dismiss();
                 }
             }
@@ -261,61 +333,5 @@ public class SignUpActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        Log.d("TAG", "onActivityResult:   "+resultCode+"  "+requestCode);
-        if (resultCode == RESULT_OK) {
-            if (requestCode == 1) {
-                File f = new File(Environment.getExternalStorageDirectory().toString());
-                Log.d("TAG", "onActivityResult: "+f.getAbsolutePath());
-                for (File temp : f.listFiles()) {
-                    if (temp.getName().equals("temp.jpg")) {
-                        f = temp;
-                        break;
-                    }
-                }
 
-                try {
-                    Log.d("TAG", "onActivityResult: vawje");
-                    Bitmap bitmap;
-                    BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
-                    bitmap = BitmapFactory.decodeFile(f.getAbsolutePath(),
-                            bitmapOptions);
-                    activitySignupBinding.profileImage.setImageBitmap(bitmap);
-                    String path = android.os.Environment
-                            .getExternalStorageDirectory()
-                            + File.separator
-                            + "Phoenix" + File.separator + "default";
-                    f.delete();
-                    OutputStream outFile = null;
-                    File file = new File(path, String.valueOf(System.currentTimeMillis()) + ".jpg");
-                    try {
-                        outFile = new FileOutputStream(file);
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 85, outFile);
-                        outFile.flush();
-                        outFile.close();
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            } else if (requestCode == 2) {
-                filePath = data.getData();
-                try {
-                    InputStream inputStream = getContentResolver().openInputStream(filePath);
-                    bitmap = BitmapFactory.decodeStream(inputStream);
-                    activitySignupBinding.profileImage.setImageBitmap(bitmap);
-                } catch (Exception e) {
-
-                }
-            }
-        }
-
-    }
 }
